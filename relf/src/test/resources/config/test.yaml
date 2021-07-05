@@ -1,0 +1,6 @@
+Test.interpolate:
+  interpolate.string: 'string:%(Client.name)'
+  interpolate.array:
+  - 'string:%(Client.name)'
+  - - 'array:%(Client.name)'
+    - 'array:%(Client.name)'

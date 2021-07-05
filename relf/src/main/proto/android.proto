@@ -1,0 +1,1585 @@
+// Copyright 2018 NexusLab. All Rights Reserved
+// LINT: LEGACY_NAMES
+
+// These are the Android-specific messages used in GRR
+
+// Protobuf plugin formatting is broken! Disable auto formatting now!
+// https://stackoverflow.com/questions/3375307/how-to-disable-code-formatting-for-some-part-of-the-code-using-comments
+// @formatter:off
+syntax = "proto2";
+
+option java_package = "org.nexus_lab.relf.proto";
+option java_multiple_files = true;
+option optimize_for = LITE_RUNTIME;
+
+import "semantic.proto";
+import "jobs.proto";
+
+message AndroidHardwareInfo {
+  option (semantic) = {
+    description : "Android device hardware information."
+  };
+
+  optional string brand = 1;
+  optional string manufacturer = 2;
+  optional string model = 3 [ (sem_type) = {
+    description : "The end-user-visible name for the end product."
+  } ];
+  optional string product = 4
+      [ (sem_type) = {description : "The name of the overall product."} ];
+  optional string hardware = 5 [ (sem_type) = {
+    description :
+        "The name of the hardware (from the kernel command line or /proc)."
+  } ];
+  optional string board = 6 [ (sem_type) = {
+    description : "The name of the underlying board, like \"goldfish\"."
+  } ];
+  optional string device = 7
+      [ (sem_type) = {description : "The name of the industrial design."} ];
+  optional string serial = 8 [ (sem_type) = {
+    description : "A hardware serial number, if available. Alphanumeric only, "
+                  "case-insensitive."
+  } ];
+  repeated string supported_abis = 9 [ (sem_type) = {
+    description : "An ordered list of ABIs supported by this device. The most "
+                  "preferred ABI is "
+                  "the first element in the list."
+  } ];
+  optional string baseband = 10;
+  optional string radio = 11
+      [ (sem_type) = {description : "The radio firmware version number."} ];
+  optional string bootloader = 12
+      [ (sem_type) = {description : "The system bootloader version number."} ];
+  optional bool isEmulator = 13;
+  optional bool isContainer = 14;
+  optional bool isDebuggable = 15;
+}
+
+message AndroidOsInfo {
+  option (semantic) = {
+    description : "Android system information."
+  };
+
+  optional uint32 version = 1;
+  optional string versionName = 2;
+  optional string versionCodename = 3 [ (sem_type) = {
+    description :
+        "The current development codename, or the string \"REL\" if this is a "
+        "release build."
+  } ];
+  optional string versionIncremental = 4 [ (sem_type) = {
+    description :
+        "The internal value used by the underlying source control to represent "
+        "this build."
+  } ];
+  optional string securityPatch = 5;
+  optional string kernelVersion = 6;
+
+  optional AndroidOsBuildInfo buildInfo = 7;
+}
+
+message AndroidOsBuildInfo {
+  option (semantic) = {
+    description : "Android system build information."
+  };
+
+  enum BuildType {
+    ENG = 0;
+    USERDEBUG = 1;
+    USER = 2;
+  }
+
+  optional string id = 1;
+  optional string number = 2;
+  optional BuildType type = 7;
+  optional string user = 3;
+  optional uint64 time = 4 [ (sem_type) = {type : "RDFDatetime"} ];
+  optional string host = 5;
+  optional string fingerprint = 6;
+  repeated string tags = 8 [ (sem_type) = {
+    description : "Tags describing the build, like \"unsigned\", \"debug\"."
+  } ];
+}
+
+message AndroidDeviceInfo {
+  option (semantic) = {
+    description : "Android device information."
+  };
+
+  optional AndroidHardwareInfo hardware = 1;
+  optional AndroidOsInfo system = 2;
+}
+
+message AndroidPackageInfo {
+  option (semantic) = {
+    description : "Android package information."
+  };
+
+  enum InstallLocation {
+    UNSPECIFIED = -1;
+    AUTO = 0;
+    INTERNAL_ONLY = 1;
+    PREFER_EXTERNAL = 2;
+  }
+
+  enum Category {
+    UNDEFINED = -1;
+    GAME = 0;
+    AUDIO = 1;
+    VIDEO = 2;
+    IMAGE = 3;
+    SOCIAL = 4;
+    NEWS = 5;
+    MAPS = 6;
+    PRODUCTIVITY = 7;
+  }
+
+  optional string name = 1;
+  optional string packageName = 2;
+  optional string versionName = 3;
+  optional uint64 versionCode = 4;
+  optional uint32 minSdkVersion = 5;
+  optional uint32 targetSdkVersion = 6;
+  optional Category category = 7;
+
+  optional bool isEnabled = 8;
+  optional uint32 uid = 9;
+  repeated uint32 gids = 10;
+  optional string sharedUserId = 11 [
+    (sem_type) = {description : "The shared user ID name of this package"}
+  ];
+  optional uint64 firstInstallTime = 12 [ (sem_type) = {type : "RDFDatetime"} ];
+  optional uint64 lastUpdateTime = 13 [ (sem_type) = {type : "RDFDatetime"} ];
+  optional InstallLocation installLocation = 14 [ (sem_type) = {
+    description : "The install location requested by the package. Can be "
+                  "UNSPECIFIED, AUTO, "
+                  "INTERNAL_ONLY, or PREFER_EXTERNAL."
+  } ];
+  optional string sourceDir = 15 [ (sem_type) = {
+    description : "Full path to the base APK for this application."
+  } ];
+  optional string dataDir = 16 [ (sem_type) = {
+    description :
+        "Full path to the default directory assigned to the package for its "
+        "persistent data."
+  } ];
+
+  repeated string requestedPermissions = 17;
+  repeated bytes signatures = 18 [ (sem_type) = {type : "RDFX509Cert"} ];
+}
+
+message AndroidCellInfo {
+  option (semantic) = {
+    description : "Telephony cell information from a point in time."
+  };
+
+  enum CellType {
+    CELL_UNKNOWN = 0;
+    GSM = 1;
+    CDMA = 2;
+    LTE = 3;
+    WCDMA = 4;
+  }
+
+  enum ConnectionStatus {
+    NONE = 0;
+    PRIMARY_SERVING = 1;
+    SECONDARY_SERVING = 2;
+    CONNECTION_UNKNOWN = 2147483647;
+  }
+
+  optional CellType type = 1
+      [ (sem_type) = {description : "Cell service type."} ];
+  optional ConnectionStatus status = 2
+      [ (sem_type) = {description : "The connection status of the cell."} ];
+  optional uint64 timestamp = 3 [ (sem_type) = {
+    type : "RDFDatetime",
+    description :
+        "Approximate time of this cell information in nanos since boot."
+  } ];
+  optional bool isRegistered = 4 [ (sem_type) = {
+    description : "If this cell is registered to the mobile network."
+  } ];
+  optional uint32 level = 5
+      [ (sem_type) = {description : "The signal level as an int from 0..4."} ];
+  optional string identity = 6
+      [ (sem_type) = {description : "Additional cell identity information."} ];
+  optional string signalStrength = 7 [ (sem_type) = {
+    description : "Additional signal strength related information."
+  } ];
+}
+
+message AndroidSubscriptionInfo {
+  option (semantic) = {
+    description : "Information about the current Telephony subscriptions."
+  };
+
+  enum SimState {
+    SIM_UNKNOWN = 0;
+    SIM_ABSENT = 1;
+    SIM_PIN_REQUIRED = 2;
+    SIM_PUK_REQUIRED = 3;
+    SIM_NETWORK_LOCKED = 4;
+    SIM_READY = 5;
+    SIM_NOT_READY = 6;
+    SIM_PERM_DISABLED = 7;
+    SIM_CARD_IO_ERROR = 8;
+    SIM_CARD_RESTRICTED = 9;
+    SIM_LOADED = 10;
+    SIM_PRESENT = 11;
+  }
+
+  enum RadioType {
+    RT_NONE = 0;
+    RT_GSM = 1;
+    RT_CDMA = 2;
+    RT_SIP = 3;
+    RT_THIRD_PARTY = 4;
+    RT_IMS = 5;
+    RT_CDMA_LTE = 6;
+  }
+
+  enum DataNetworkType {
+    DNT_UNKNOWN = 0;
+    DNT_GPRS = 1;
+    DNT_EDGE = 2;
+    DNT_UMTS = 3;
+    DNT_CDMA = 4;
+    DNT_EVDO_0 = 5;
+    DNT_EVDO_A = 6;
+    DNT_1XRTT = 7;
+    DNT_HSDPA = 8;
+    DNT_HSUPA = 9;
+    DNT_HSPA = 10;
+    DNT_IDEN = 11;
+    DNT_EVDO_B = 12;
+    DNT_LTE = 13;
+    DNT_EHRPD = 14;
+    DNT_HSPAP = 15;
+    DNT_GSM = 16;
+    DNT_TD_SCDMA = 17;
+    DNT_IWLAN = 18;
+    DNT_LTE_CA = 19;
+  }
+
+  enum ServiceState {
+    SRV_IN_SERVICE = 0;
+    SRV_OUT_OF_SERVICE = 1;
+    SRV_EMERGENCY_ONLY = 2;
+    SRV_POWER_OFF = 3;
+  }
+
+  optional uint32 simSlot = 1 [ (sem_type) = {
+    description : "The slot index of this Subscription's SIM card."
+  } ];
+  optional string simSerialNumber = 2 [ (sem_type) = {
+    description : "The serial number of the SIM, if applicable."
+  } ];
+  optional string phoneNumber = 3
+      [ (sem_type) = {description : "The phone number of this subscription."} ];
+  optional string voicemailNumber = 4 [
+    (sem_type) = {description : "The voicemail number of this subscription."}
+  ];
+  optional uint32 mcc = 5
+      [ (sem_type) = {description : "Mobile Country Code."} ];
+  optional uint32 mnc = 6
+      [ (sem_type) = {description : "Mobile Network Code."} ];
+  optional string subscriptionName = 7 [ (sem_type) = {
+    description :
+        "The name displayed to the user that identifies subscription."
+  } ];
+  optional string carrierName = 8 [ (sem_type) = {
+    description : "The name displayed to the user that identifies Subscription "
+                  "provider name."
+  } ];
+  optional string deviceId = 9 [ (sem_type) = {
+    description :
+        "The unique device ID, for example, the IMEI for GSM and the MEID "
+        "or ESN for CDMA phones."
+  } ];
+  optional string subscriberId = 10 [ (sem_type) = {
+    description :
+        "The unique subscriber ID, for example, the IMSI for a GSM phone."
+  } ];
+  optional RadioType radioType = 11 [ (sem_type) = {
+    description : "The type of radio used to transmit voice calls."
+  } ];
+  optional DataNetworkType dataNetworkType = 12 [ (sem_type) = {
+    description : "The type of radio used to transmit network data."
+  } ];
+  optional SimState simState = 13
+      [ (sem_type) = {description : "The state of the SIM card."} ];
+  optional ServiceState serviceState = 14
+      [ (sem_type) = {description : "Telephony service state."} ];
+  optional string serviceInfo = 15 [
+    (sem_type) = {description : "Additional telephony service information."}
+  ];
+  optional uint32 level = 16
+      [ (sem_type) = {description : "The signal level as an int from 0..4."} ];
+  optional string signalStrength = 17 [ (sem_type) = {
+    description : "Additional signal strength related information."
+  } ];
+  optional bool isRoaming = 18 [ (sem_type) = {
+    description : "The data roaming state for this subscription."
+  } ];
+  optional bool isDataEnabled = 19 [ (sem_type) = {
+    description : "Whether mobile data is enabled or not per user setting."
+  } ];
+  optional bool isConcurrentVoiceAndDataSupported = 20 [ (sem_type) = {
+    description : "Whether the device is currently on a technology (e.g. UMTS "
+                  "or LTE) which can "
+                  "support voice and data simultaneously."
+  } ];
+}
+
+message AndroidTelephonyInfo {
+  option (semantic) = {
+    description : "Telephony information of an Android device."
+  };
+
+  enum CallState {
+    CALL_IDLE = 0;
+    CALL_RINGING = 1;
+    CALL_OFFHOOK = 2;
+  }
+
+  enum DataState {
+    DATA_UNKNOWN = -1;
+    DATA_DISCONNECTED = 0;
+    DATA_CONNECTING = 1;
+    DATA_CONNECTED = 2;
+    DATA_SUSPENDED = 3;
+  }
+
+  enum DataActivity {
+    DATA_ACTIVITY_NONE = 0;
+    DATA_ACTIVITY_IN = 1;
+    DATA_ACTIVITY_OUT = 2;
+    DATA_ACTIVITY_INOUT = 3;
+    DATA_ACTIVITY_DORMANT = 4;
+  }
+
+  repeated AndroidCellInfo cells = 1 [ (sem_type) = {
+    description : "All observed cell information from all radios on the device "
+                  "including the "
+                  "primary and neighboring cells"
+  } ];
+  repeated AndroidSubscriptionInfo subscriptions = 2 [ (sem_type) = {
+    description : "Sorted list of the currently subscription information "
+                  "records available on "
+                  "the device."
+  } ];
+  optional CallState callState = 3
+      [ (sem_type) = {description : "The current state of all phone calls."} ];
+  optional DataState dataState = 4 [ (sem_type) = {
+    description : "The current data connection state (cellular)."
+  } ];
+  optional DataActivity dataActivity = 5 [ (sem_type) = {
+    description : "The type of activity on a data connection (cellular)."
+  } ];
+  optional bool isSmsCapable = 6 [ (sem_type) = {
+    description : "If the current device supports sms service."
+  } ];
+  optional bool isVoiceCapable = 7 [ (sem_type) = {
+    description : "If the current device supports voice service."
+  } ];
+  optional uint32 phoneCount = 8 [ (sem_type) = {
+    description : "The number of phones available."
+                  "0 if none of voice, sms, data is not supported."
+                  "1 for Single standby mode (Single SIM functionality)."
+                  "2 for Dual standby mode.(Dual SIM functionality)."
+  } ];
+}
+
+message AndroidDhcpInfo {
+  option (semantic) = {
+    description : "DHCP information about a network on an Android device."
+  };
+
+  optional NetworkAddress ipAddress = 1 [
+    (sem_type) = {description : "Network IP address assigned through DHCP."}
+  ];
+  optional NetworkAddress gateway = 2
+      [ (sem_type) = {description : "Gateway IP address."} ];
+  optional NetworkAddress netmask = 3
+      [ (sem_type) = {description : "Subnet mask."} ];
+  repeated NetworkAddress dns = 4
+      [ (sem_type) = {description : "IP addresses of the DNS servers."} ];
+  optional NetworkAddress serverAddress = 5
+      [ (sem_type) = {description : "IP address of the DHCP server."} ];
+  optional uint64 leaseDuration = 6 [ (sem_type) = {
+    type : "RDFDatetimeSeconds",
+    description : "DHCP lease duration in seconds."
+  } ];
+}
+
+message AndroidWiFiConnectionInfo {
+  option (semantic) = {
+    description : "Android device WiFi connection information."
+  };
+
+  enum SupplicantState {
+    DISCONNECTED = 0;
+    INTERFACE_DISABLED = 1;
+    INACTIVE = 2;
+    SCANNING = 3;
+    AUTHENTICATING = 4;
+    ASSOCIATING = 5;
+    ASSOCIATED = 6;
+    FOUR_WAY_HANDSHAKE = 7;
+    GROUP_HANDSHAKE = 8;
+    COMPLETED = 9;
+    DORMANT = 10;
+    UNINITIALIZED = 11;
+    INVALID = 12;
+  }
+
+  optional string ssid = 1
+      [ (sem_type) = {description : "The SSID of the network."} ];
+  optional string bssid = 2
+      [ (sem_type) = {description : "The BSSID of the network."} ];
+  optional NetworkAddress ipAddress = 3
+      [ (sem_type) = {description : "Network IP address of the connection."} ];
+  optional bytes macAddress = 4 [ (sem_type) = {
+    type : "MacAddress",
+    description : "MAC address of the WLAN interface."
+  } ];
+  optional bool isHidden = 5 [ (sem_type) = {
+    description : "This is a network that does not broadcast its SSID, so an "
+                  "SSID-specific."
+                  "probe request must be used for scans."
+  } ];
+  optional int32 rssi = 6 [ (sem_type) = {
+    description : "The received signal strength indicator of the current "
+                  "802.11 network, in dBm."
+  } ];
+  optional int32 frequency = 7
+      [ (sem_type) = {description : "The current WiFi frequency in MHz."} ];
+  optional int32 linkSpeed = 8
+      [ (sem_type) = {description : "The current link speed in Mbps."} ];
+  optional int32 networkId = 9 [ (sem_type) = {
+    description :
+        "The ID number that the supplicant uses to identify this network "
+        "configuration entry."
+  } ];
+  optional SupplicantState supplicantState = 10 [ (sem_type) = {
+    description : "the detailed state of the supplicant's negotiation with an "
+                  "access point."
+  } ];
+}
+
+message AndroidWiFiConfiguration {
+  option (semantic) = {
+    description : "Information about saved WiFi network on an Android device."
+  };
+
+  enum Status {
+    CURRENT = 0;
+    DISABLED = 1;
+    ENABLED = 2;
+  }
+
+  enum AuthAlgorithm {
+    AA_OPEN = 0;
+    AA_SHARED = 1;
+    AA_LEAP = 2;
+  }
+
+  enum GroupCipher {
+    GC_WEP40 = 0;
+    GC_WEP104 = 1;
+    GC_TKIP = 2;
+    GC_CCMP = 3;
+    GC_GTK_NOT_USED = 4;
+  }
+
+  enum KeyManagement {
+    KM_NONE = 0;
+    KM_WPA_PSK = 1;
+    KM_WPA_EAP = 2;
+    KM_IEEE8021X = 3;
+    KM_WPA2_PSK = 4;
+    KM_OSEN = 5;
+    KM_FT_PSK = 6;
+    KM_FT_EAP = 7;
+  }
+
+  enum PairwiseCipher {
+    PC_NONE = 0;
+    PC_TKIP = 1;
+    PC_CCMP = 2;
+  }
+
+  enum Protocol {
+    P_WPA = 0;
+    P_RSN = 1;
+    P_OSEN = 2;
+  }
+
+  optional Status status = 1 [
+    (sem_type) = {description : "The status of the network configuration."}
+  ];
+  optional string ssid = 2
+      [ (sem_type) = {description : "The SSID of the network."} ];
+  optional string bssid = 3
+      [ (sem_type) = {description : "The BSSID of the network."} ];
+  optional bool isHidden = 4 [ (sem_type) = {
+    description : "This is a network that does not broadcast its SSID, so an "
+                  "SSID-specific "
+                  "probe request must be used for scans."
+  } ];
+  optional int32 networkId = 5 [ (sem_type) = {
+    description :
+        "The ID number that the supplicant uses to identify this network "
+        "configuration entry."
+  } ];
+  repeated AuthAlgorithm allowedAuthAlgorithms = 6 [ (sem_type) = {
+    description : "The set of authentication protocols supported by this "
+                  "configuration."
+  } ];
+  repeated GroupCipher allowedGroupCiphers = 7 [ (sem_type) = {
+    description :
+        "The set of group ciphers supported by this configuration."
+  } ];
+  repeated KeyManagement allowedKeyManagement = 8 [ (sem_type) = {
+    description : "The set of key management protocols supported by this "
+                  "configuration."
+  } ];
+  repeated PairwiseCipher allowedPairwiseCiphers = 9 [ (sem_type) = {
+    description : "The set of pairwise ciphers for WPA supported by this "
+                  "configuration."
+  } ];
+  repeated Protocol allowedProtocols = 10 [ (sem_type) = {
+    description :
+        "The set of security protocols supported by this configuration."
+  } ];
+}
+
+message AndroidWiFiScanResult {
+  option (semantic) = {
+    description : "Android WiFi AP scanning result."
+  };
+
+  enum Bandwidth {
+    W_20MHZ = 0;
+    W_40MHZ = 1;
+    W_80MHZ = 2;
+    W_160MHZ = 3;
+    W_80MHZ_PLUS_MHZ = 4;
+  }
+
+  optional string ssid = 1
+      [ (sem_type) = {description : "The SSID of the detected network."} ];
+  optional string bssid = 2
+      [ (sem_type) = {description : "The BSSID of the detected network."} ];
+  optional uint64 lastSeen = 3 [ (sem_type) = {
+    type : "RDFDatetime",
+    description : "When this scan result was last seen."
+  } ];
+  optional int32 rssi = 4 [ (sem_type) = {
+    description : "The detected signal strength indicator of the detected "
+                  "network, in dBm."
+  } ];
+  optional int32 frequency = 7
+      [ (sem_type) = {description : "The detected WiFi frequency in MHz."} ];
+  optional string capabilities = 8 [ (sem_type) = {
+    description :
+        "Describes the authentication, key management, and encryption schemes "
+        "supported by the access point."
+  } ];
+  optional Bandwidth channelWidth = 9 [ (sem_type) = {
+    description : "Access point bandwidth. One of 20MHz, 40MHz, 80MHz, 160MHz, "
+                  "or 80MHz + 80MHz."
+  } ];
+  optional int32 centerFrequency0 = 10 [ (sem_type) = {
+    description : "Not used if the AP bandwidth is 20 MHz. "
+                  "If the AP use 40, 80 or 160 MHz, this is the center "
+                  "frequency (in MHz). "
+                  "If the AP use 80 + 80 MHz, this is the center frequency of "
+                  "the first segment (in MHz)."
+  } ];
+  optional int32 centerFrequency1 = 11 [ (sem_type) = {
+    description :
+        "Only used if the AP bandwidth is 80 + 80 MHz. "
+        "This is the center frequency of the second segment (in MHz)."
+  } ];
+  optional bool isIEEE80211mcResponder = 12 [ (sem_type) = {
+    description : "Whether the WiFi access point supports the IEEE 802.11mc "
+                  "FTM standard."
+  } ];
+}
+
+message AndroidWiFiInfo {
+  option (semantic) = {
+    description :
+        "Android saved WiFi configurations, WiFi connection information, and "
+        "AP scanning results."
+  };
+
+  enum State {
+    DISABLING = 0;
+    DISABLED = 1;
+    ENABLING = 2;
+    ENABLED = 3;
+    UNKNOWN = 4;
+  }
+
+  optional State state = 1
+      [ (sem_type) = {description : "The Wi-Fi enabled state."} ];
+  optional AndroidWiFiConnectionInfo connectionInfo = 2 [ (sem_type) = {
+    description : "Dynamic information about the current Wi-Fi connection, if "
+                  "any is active."
+  } ];
+  optional AndroidDhcpInfo dhcpInfo = 3 [ (sem_type) = {
+    description : "The DHCP-assigned addresses from the last successful DHCP "
+                  "request, if any."
+  } ];
+  repeated AndroidWiFiConfiguration configuredNetworks = 4 [ (sem_type) = {
+    description :
+        "All the networks configured for the current foreground user."
+  } ];
+  repeated AndroidWiFiScanResult scanResults = 5 [ (sem_type) = {
+    description : "The results of the latest access point scan."
+  } ];
+  optional bool is5GHzBandSupported = 6 [
+    (sem_type) = {description : "If the WiFi adapter supports 5 GHz band."}
+  ];
+  optional bool isDeviceToApRttSupported = 7 [ (sem_type) = {
+    description : "If the WiFi adapter supports Device-to-AP RTT."
+  } ];
+  optional bool isEnhancedPowerReportingSupported = 8 [ (sem_type) = {
+    description :
+        "If the WiFi adapter supports advanced power/performance counters."
+  } ];
+  optional bool isP2PSupported = 9 [ (sem_type) = {
+    description :
+        "If the WiFi adapter supports WifiP2pManager (Wi-Fi Direct)."
+  } ];
+  optional bool isPreferredNetworkOffloadSupported = 10 [ (sem_type) = {
+    description :
+        "If the WiFi adapter supports offloaded connectivity scan."
+  } ];
+  optional bool isScanAlwaysAvailable = 11 [ (sem_type) = {
+    description :
+        "If the WiFi adapter supports scanning even when it is turned off."
+  } ];
+  optional bool isTdlsSupported = 12 [ (sem_type) = {
+    description : "If the WiFi adapter supports Tunnel Directed Link Setup."
+  } ];
+}
+
+message AndroidStorageInfo {
+  option (semantic) = {
+    description : "Android device internal/external storage information."
+  };
+
+  enum StorageState {
+    UNKNOWN = 0;
+    REMOVED = 1;
+    UNMOUNTED = 2;
+    CHECKING = 3;
+    NOFS = 4;
+    MOUNTED = 5;
+    MOUNTED_READ_ONLY = 6;
+    SHARED = 7;
+    BAD_REMOVAL = 8;
+    UNMOUNTABLE = 9;
+    EJECTING = 10;
+  }
+
+  optional string id = 1;
+  optional string description = 2;
+  optional string fsUuid = 3
+      [ (sem_type) = {description : "The volume UUID."} ];
+  optional bool isPrimary = 4 [ (sem_type) = {
+    description :
+        "True if the volume is the primary shared/external storage."
+  } ];
+  optional bool isEmulated = 5
+      [ (sem_type) = {description : "True if the volume is emulated."} ];
+  optional bool isRemovable = 6
+      [ (sem_type) = {description : "True if the volume is removable."} ];
+  optional string path = 7
+      [ (sem_type) = {description : "The mount path for the volume."} ];
+  optional StorageState state = 8
+      [ (sem_type) = {description : "The current state of the volume."} ];
+  optional uint64 totalSpace = 9 [ (sem_type) = {
+    type : "ByteSize",
+    description : "Total volume size in bytes."
+  } ];
+  optional uint64 usedSpace = 10 [ (sem_type) = {
+    type : "ByteSize",
+    description : "Volume used space size in bytes."
+  } ];
+  optional uint64 maxFileSize = 11 [ (sem_type) = {
+    type : "ByteSize",
+    description :
+        "Maximum file size for the volume, or zero if it is unbounded."
+  } ];
+  optional uint64 mtpReserveSize = 12 [ (sem_type) = {
+    type : "ByteSize",
+    description : "Number of bytes of space to leave unallocated by MTP."
+  } ];
+  optional bool isAllowMassStorage = 13 [ (sem_type) = {
+    description : "True if this volume can be shared via USB mass storage."
+  } ];
+}
+
+message AndroidBatteryInfo {
+  option (semantic) = {
+    description : "Android device battery information."
+  };
+
+  enum ChargingStatus {
+    STATUS_UNKNOWN = 1;
+    CHARGING = 2;
+    DISCHARGING = 3;
+    NOT_CHARGING = 4;
+    FULL = 5;
+  }
+
+  enum Health {
+    HEALTH_UNKNOWN = 1;
+    GOOD = 2;
+    OVERHEAT = 3;
+    DEAD = 4;
+    OVER_VOLTAGE = 5;
+    UNSPECIFIED_FAILURE = 6;
+    COLD = 7;
+  }
+
+  enum PowerSource {
+    BATTERY = 0;
+    AC = 1;
+    USB = 2;
+    WIRELESS = 4;
+  }
+
+  optional ChargingStatus status = 1;
+  optional Health health = 2;
+  optional bool isPresent = 3
+      [ (sem_type) = {description : "Whether a battery is present."} ];
+  optional float level = 4 [ (sem_type) = {
+    description : "Current battery level percentage, from 0 to 100."
+  } ];
+  optional PowerSource powerSource = 5 [ (sem_type) = {
+    description : "Whether the device is plugged into a power source and what "
+                  "kind of power it uses."
+  } ];
+  optional uint32 voltage = 6 [ (sem_type) = {
+    description : "Current battery voltage level in millivolts."
+  } ];
+  optional uint32 temperature = 7 [ (sem_type) = {
+    description : "Current battery temperature level in tenths of a degree "
+                  "Centigrade."
+  } ];
+  optional string technology = 8 [ (sem_type) = {
+    description : "The technology of the current battery, e.g. Li-ion."
+  } ];
+}
+
+message AndroidContactInfo {
+  option (semantic) = {
+    description : "Detailed contact information of a single person."
+  };
+
+  enum PhoneNumberType {
+    PHONE_CUSTOM = 0;
+    PHONE_HOME = 1;
+    PHONE_MOBILE = 2;
+    PHONE_WORK = 3;
+    PHONE_FAX_WORK = 4;
+    PHONE_FAX_HOME = 5;
+    PHONE_PAGER = 6;
+    PHONE_OTHER = 7;
+    PHONE_CALLBACK = 8;
+    PHONE_CAR = 9;
+    PHONE_COMPANY_MAIN = 10;
+    PHONE_ISDN = 11;
+    PHONE_MAIN = 12;
+    PHONE_OTHER_FAX = 13;
+    PHONE_RADIO = 14;
+    PHONE_TELEX = 15;
+    PHONE_TTY_TDD = 16;
+    PHONE_WORK_MOBILE = 17;
+    PHONE_WORK_PAGER = 18;
+    PHONE_ASSISTANT = 19;
+    PHONE_MMS = 20;
+  }
+
+  message AndroidPhoneNumber {
+    optional string number = 1;
+    optional PhoneNumberType type = 2;
+    optional string label = 3;
+  }
+
+  enum EmailType {
+    EMAIL_CUSTOM = 0;
+    EMAIL_HOME = 1;
+    EMAIL_WORK = 2;
+    EMAIL_OTHER = 3;
+    EMAIL_MOBILE = 4;
+  }
+
+  message AndroidEmailAddress {
+    optional string address = 1;
+    optional EmailType type = 2;
+    optional string label = 3;
+  }
+
+  enum PostalAddressType {
+    POSTAL_CUSTOM = 0;
+    POSTAL_HOME = 1;
+    POSTAL_WORK = 2;
+    POSTAL_OTHER = 3;
+  }
+
+  message AndroidPostalAddress {
+    optional string address = 1;
+    optional PostalAddressType type = 2;
+    optional string label = 3;
+  }
+
+  enum IMProtocol {
+    IM_PROTOCOL_CUSTOM = -1;
+    IM_PROTOCOL_AIM = 0;
+    IM_PROTOCOL_MSN = 1;
+    IM_PROTOCOL_YAHOO = 2;
+    IM_PROTOCOL_SKYPE = 3;
+    IM_PROTOCOL_QQ = 4;
+    IM_PROTOCOL_GOOGLE_TALK = 5;
+    IM_PROTOCOL_ICQ = 6;
+    IM_PROTOCOL_JABBER = 7;
+    IM_PROTOCOL_NETMEETING = 8;
+  }
+
+  enum IMType {
+    IM_CUSTOM = 0;
+    IM_HOME = 1;
+    IM_WORK = 2;
+    IM_OTHER = 3;
+  }
+
+  message AndroidIM {
+    optional string account = 1;
+    optional IMProtocol protocol = 2
+        [ (sem_type) = {description : "Instant message service type."} ];
+    optional string customProtocol = 3
+        [ (sem_type) = {description : "Custom instant message service name."} ];
+    optional IMType type = 4;
+    optional string label = 5;
+  }
+
+  optional string name = 1;
+  optional string phoneticName = 2 [
+    (sem_type) = {description : "Contact's name showing in the phone app."}
+  ];
+  optional string nickname = 3;
+  optional string company = 4 [ (sem_type) = {
+    description : "The name of the company for which the contact works."
+  } ];
+  optional string title = 5
+      [ (sem_type) = {description : "Job title of the contact."} ];
+  repeated AndroidPhoneNumber phoneNumbers = 6
+      [ (sem_type) = {description : "Contact's phone numbers."} ];
+  repeated AndroidEmailAddress emailAddresses = 7
+      [ (sem_type) = {description : "Contact's email addresses."} ];
+  repeated AndroidPostalAddress postalAddresses = 8
+      [ (sem_type) = {description : "Contact's postal addresses."} ];
+  repeated AndroidIM ims = 9 [ (sem_type) = {
+    description : "Instant message service account of the contact."
+  } ];
+  optional string website = 10
+      [ (sem_type) = {description : "Personal website URL."} ];
+  optional string note = 11
+      [ (sem_type) = {description : "User's comment of the contact."} ];
+  optional string sip = 12 [
+    (sem_type) = {description : "Session Initiation Protocol (SIP) number."}
+  ];
+}
+
+message AndroidCallLog {
+  option (semantic) = {
+    description : "Detail information of a phone call on an Android device."
+  };
+
+  enum CallType {
+    TYPE_INCOMING = 1;
+    TYPE_OUTGOING = 2;
+    TYPE_MISSED = 3;
+    TYPE_VOICEMAIL = 4;
+    TYPE_REJECTED = 5;
+    TYPE_BLOCKED = 6;
+    TYPE_ANSWERED_EXTERNALLY = 7;
+  }
+
+  enum CallFeatures {
+    FEATURES_VIDEO = 1;
+    FEATURES_PULLED_EXTERNALLY = 2;
+    FEATURES_HD_CALL = 4;
+    FEATURES_WIFI = 8;
+    FEATURES_ASSISTED_DIALING_USED = 16;
+    FEATURES_RTT = 32;
+  }
+
+  enum NumberPresentation {
+    /** Number is allowed to display for caller id. */
+    PRESENTATION_ALLOWED = 1;
+    /** Number is blocked by user. */
+    PRESENTATION_RESTRICTED = 2;
+    /** Number is not specified or unknown by network. */
+    PRESENTATION_UNKNOWN = 3;
+    /** Number is a pay phone. */
+    PRESENTATION_PAYPHONE = 4;
+  }
+
+  optional CallType type = 1;
+  optional string phoneNumber = 2;
+  optional string contactName = 3 [ (sem_type) = {
+    description :
+        "The cached name associated with the phone number, if it exists."
+  } ];
+  optional uint64 date = 4 [ (sem_type) = {
+    type : "RDFDatetime",
+    description : "The date the call occured."
+  } ];
+  optional uint64 duration = 5 [ (sem_type) = {
+    type : "Duration",
+    description : "The duration of the call."
+  } ];
+  optional bool isAcknowledged = 6 [ (sem_type) = {
+    description : "Whether or not the call has been acknowledged."
+  } ];
+  optional string countryIso = 7 [ (sem_type) = {
+    description :
+        "The ISO 3166-1 two letters country code of the country where the "
+        "user received or made the call."
+  } ];
+  optional string geocodedLocation = 8 [ (sem_type) = {
+    description :
+        "A geocoded location for the number associated with this call."
+  } ];
+  repeated CallFeatures features = 9
+      [ (sem_type) = {description : "The features of the call (e.g. video)."} ];
+  optional NumberPresentation presentation = 10 [ (sem_type) = {
+    description : "The number presenting rules set by the network."
+  } ];
+}
+
+message AndroidBluetoothDevice {
+  option (semantic) = {
+    description : "Detail information of a bonded or nearby Bluetooth device."
+  };
+
+  enum DeviceClass {
+    CLASS_MISC = 0x0000;
+    CLASS_COMPUTER = 0x0100;
+    CLASS_PHONE = 0x0200;
+    CLASS_NETWORKING = 0x0300;
+    CLASS_AUDIO_VIDEO = 0x0400;
+    CLASS_PERIPHERAL = 0x0500;
+    CLASS_IMAGING = 0x0600;
+    CLASS_WEARABLE = 0x0700;
+    CLASS_TOY = 0x0800;
+    CLASS_HEALTH = 0x0900;
+    CLASS_UNCATEGORIZED = 0x1F00;
+  }
+
+  enum BondState {
+    BOND_NONE = 1;
+    BOND_BONDING = 2;
+    BOND_BONDED = 3;
+  }
+
+  enum DeviceType {
+    DEVICE_TYPE_UNKNOWN = 0;
+    DEVICE_TYPE_CLASSIC = 1;
+    DEVICE_TYPE_LE = 2;
+    DEVICE_TYPE_DUAL = 3;
+  }
+
+  optional bytes address = 1 [ (sem_type) = {
+    type : "MacAddress",
+    description : "MAC address of the Bluetooth device."
+  } ];
+  optional DeviceClass deviceClass = 2 [
+    (sem_type) = {description : "The class (type) of the Bluetooth device."}
+  ];
+  optional BondState bondState = 3 [
+    (sem_type) = {description : "The bond state of the Bluetooth device."}
+  ];
+  optional string name = 4 [ (sem_type) = {
+    description : "The friendly Bluetooth name of the Bluetooth device."
+  } ];
+  optional DeviceType type = 5 [
+    (sem_type) = {description : "The device type of the Bluetooth device."}
+  ];
+  repeated string uuid = 6 [ (sem_type) = {
+    description : "The supported features (UUIDs) of the Bluetooth device."
+  } ];
+  optional int32 rssi = 7 [ (sem_type) = {
+    description : "The received signal strength indicator of the Bluetooth "
+                  "device, in dBm."
+  } ];
+}
+
+message AndroidBluetoothInfo {
+  option (semantic) = {
+    description : "Detail information of the built-in Bluetooth adapter and "
+                  "bonded or nearby Bluetooth devices."
+  };
+
+  enum DeviceState {
+    STATE_OFF = 0;
+    STATE_TURNING_ON = 1;
+    STATE_ON = 2;
+    STATE_TURNING_OFF = 3;
+    STATE_BLE_TURNING_ON = 4;
+    STATE_BLE_ON = 5;
+    STATE_BLE_TURNING_OFF = 6;
+  }
+
+  enum ScanMode {
+    SCAN_MODE_NONE = 0;
+    SCAN_MODE_CONNECTABLE = 1;
+    SCAN_MODE_CONNECTABLE_DISCOVERABLE = 2;
+  }
+
+  optional DeviceState state = 1;
+  optional bytes address = 2 [ (sem_type) = {
+    type : "MacAddress",
+    description : "MAC address of the local Bluetooth device."
+  } ];
+  optional string name = 3 [ (sem_type) = {
+    description :
+        "The friendly Bluetooth name of the local Bluetooth device."
+  } ];
+  optional ScanMode scanMode = 4 [ (sem_type) = {
+    description :
+        "The current Bluetooth scan mode of the local Bluetooth adapter."
+  } ];
+  repeated AndroidBluetoothDevice bondedDevices = 5 [ (sem_type) = {
+    description : "The set of Bluetooth devices that are bonded (paired) to "
+                  "the local adapter."
+  } ];
+  repeated AndroidBluetoothDevice nearbyDevices = 6 [ (sem_type) = {
+    description : "The set of Bluetooth devices that are discoverable by the "
+                  "local adapter."
+  } ];
+  repeated AndroidBluetoothDevice nearbyLEDevices = 7 [ (sem_type) = {
+    description : "The set of Bluetooth Low Energy devices that are "
+                  "discoverable by the local adapter."
+  } ];
+  optional bool isMultipleAdvertisementSupported = 8 [ (sem_type) = {
+    description : "If the multi advertisement is supported by the chipset."
+  } ];
+  optional bool isOffloadedFilteringSupported = 9
+      [ (sem_type) = {description : "If offloaded filters are supported."} ];
+  optional bool isOffloadedScanBatchingSupported = 10 [
+    (sem_type) = {description : "If offloaded scan batching is supported"}
+  ];
+  optional bool isLe2MPhySupported = 11
+      [ (sem_type) = {description : "If LE 2M PHY feature is supported."} ];
+  optional bool isLeCodedPhySupported = 12
+      [ (sem_type) = {description : "If LE Coded PHY feature is supported."} ];
+  optional bool isLeExtendedAdvertisingSupported = 13 [ (sem_type) = {
+    description : "If LE Extended Advertising feature is supported."
+  } ];
+  optional bool isLePeriodicAdvertisingSupported = 14 [ (sem_type) = {
+    description : "If LE Periodic Advertising feature is supported."
+  } ];
+  optional uint32 leMaximumAdvertisingDataLength = 15 [ (sem_type) = {
+    description :
+        "The maximum LE advertising data length in bytes, "
+        "if LE Extended Advertising feature is supported, 0 otherwise."
+  } ];
+}
+
+message AndroidSmsMmsBody {
+  option (semantic) = {
+    description : "The body part of a SMS/MMS message."
+  };
+  optional string contentType = 1
+      [ (sem_type) = {description : "The content type of the message body."} ];
+  optional bytes data = 2
+      [ (sem_type) = {description : "The data of the message body."} ];
+}
+
+message AndroidSmsMms {
+  option (semantic) = {
+    description : "A Short Message Service (SMS) or Multimedia Messaging "
+                  "Service (MMS) message."
+  };
+
+  enum Type {
+    SMS = 0;
+    MMS = 1;
+  }
+
+  enum MessageBox {
+    MESSAGE_BOX_ALL = 0;
+    MESSAGE_BOX_INBOX = 1;
+    MESSAGE_BOX_SENT = 2;
+    MESSAGE_BOX_DRAFT = 3;
+    MESSAGE_BOX_OUTBOX = 4;
+    MESSAGE_BOX_FAILED = 5;
+    MESSAGE_BOX_QUEUED = 6;
+  }
+
+  optional Type type = 1
+      [ (sem_type) = {description : "The type of message."} ];
+  optional MessageBox messageBox = 2
+      [ (sem_type) = {description : "The box which the message belongs to."} ];
+  optional uint64 threadId = 3
+      [ (sem_type) = {description : "The thread ID of the message."} ];
+  optional int32 status = 4 [ (sem_type) = {
+    description : "TP-Status value for SMS, X-Mms-Status for MMS."
+  } ];
+  repeated string from = 5
+      [ (sem_type) = {description : "The addresses of the senders."} ];
+  repeated string to = 6
+      [ (sem_type) = {description : "The addresses of the recipients."} ];
+  repeated string cc = 7
+      [ (sem_type) = {description : "The addresses of the cc."} ];
+  repeated string bcc = 8
+      [ (sem_type) = {description : "The addresses of the bcc."} ];
+  optional uint64 dateReceived = 9 [ (sem_type) = {
+    type : "RDFDatetime",
+    description : "The date the message was received."
+  } ];
+  optional uint64 dateSent = 10 [ (sem_type) = {
+    type : "RDFDatetime",
+    description : "The date the message was received."
+  } ];
+  optional string subject = 11 [
+    (sem_type) = {description : "The subject of the message, if present."}
+  ];
+  repeated AndroidSmsMmsBody body = 12
+      [ (sem_type) = {description : "The body of the message."} ];
+  optional bool isRead = 13
+      [ (sem_type) = {description : "Has the message been read?"} ];
+  optional bool isSeen = 14
+      [ (sem_type) = {description : "Has the message been seen by the user?"} ];
+  optional bool isLocked = 15
+      [ (sem_type) = {description : "Is the message locked?"} ];
+  optional string creator = 16 [ (sem_type) = {
+    description :
+        "The identity of the sender of a sent message. "
+        "It is usually the package name of the app which sends the message."
+  } ];
+}
+
+message AndroidLocation {
+  option (semantic) = {
+    description : "Location information of an Android device."
+  };
+
+  optional uint64 time = 1 [ (sem_type) = {
+    type : "RDFDatetime",
+    description : "The UTC time of the location fix."
+  } ];
+  optional double latitude = 2
+      [ (sem_type) = {description : "The latitude in degrees."} ];
+  optional double longitude = 3
+      [ (sem_type) = {description : "The longitude in degrees."} ];
+  optional double altitude = 4 [ (sem_type) = {
+    description : "The altitude, if available, "
+                  "in meters above the WGS 84 reference ellipsoid."
+  } ];
+  optional float horizontalAccuracy = 5 [ (sem_type) = {
+    description : "The estimated horizontal accuracy of this location, radial, "
+                  "in meters."
+  } ];
+  optional float verticalAccuracy = 6 [ (sem_type) = {
+    description :
+        "The estimated vertical accuracy of this location, in meters."
+  } ];
+  optional float speed = 7 [ (sem_type) = {
+    description :
+        "The speed if it is available, in meters/second over ground."
+  } ];
+  optional float speedAccuracy = 8 [ (sem_type) = {
+    description : "The estimated speed accuracy of this location, in meters "
+                  "per second."
+  } ];
+  optional float bearing = 9
+      [ (sem_type) = {description : "Get the bearing, in degrees."} ];
+  optional float bearingAccuracy = 10 [ (sem_type) = {
+    description :
+        "The estimated bearing accuracy of this location, in degrees."
+  } ];
+  optional string provider = 11 [ (sem_type) = {
+    description : "The name of the provider that generated this fix."
+  } ];
+  optional bool isFromMockProvider = 12 [
+    (sem_type) = {description : "If the Location came from a mock provider."}
+  ];
+  optional string extras = 13 [ (sem_type) = {
+    description :
+        "Additional provider-specific information about the location fix."
+  } ];
+}
+
+message AndroidSystemSettings {
+  option (semantic) = {
+    description : "Android system settings."
+  };
+
+  optional Dict system = 1 [ (sem_type) = {
+    description :
+        "System settings, containing miscellaneous system preferences. "
+        "Please see "
+        "https://developer.android.com/reference/android/provider/"
+        "Settings.System"
+  } ];
+  optional Dict global = 2 [ (sem_type) = {
+    description : "Global system settings, containing preferences that always "
+                  "apply identically to all defined users. "
+                  "Please see "
+                  "https://developer.android.com/reference/android/provider/"
+                  "Settings.Global"
+  } ];
+  optional Dict secure = 3 [ (sem_type) = {
+    description : "Secure system settings, containing system preferences that "
+                  "applications can read but are not allowed to write. "
+                  "Please see "
+                  "https://developer.android.com/reference/android/provider/"
+                  "Settings.Secure"
+  } ];
+}
+
+enum AndroidSensorType {
+  ACCELEROMETER = 1;
+  MAGNETIC_FIELD = 2;
+  ORIENTATION = 3;
+  GYROSCOPE = 4;
+  LIGHT = 5;
+  PRESSURE = 6;
+  TEMPERATURE = 7;
+  PROXIMITY = 8;
+  GRAVITY = 9;
+  LINEAR_ACCELERATION = 10;
+  ROTATION_VECTOR = 11;
+  RELATIVE_HUMIDITY = 12;
+  AMBIENT_TEMPERATURE = 13;
+  MAGNETIC_FIELD_UNCALIBRATED = 14;
+  GAME_ROTATION_VECTOR = 15;
+  GYROSCOPE_UNCALIBRATED = 16;
+  SIGNIFICANT_MOTION = 17;
+  STEP_DETECTOR = 18;
+  STEP_COUNTER = 19;
+  GEOMAGNETIC_ROTATION_VECTOR = 20;
+  HEART_RATE = 21;
+  TILT_DETECTOR = 22;
+  WAKE_GESTURE = 23;
+  GLANCE_GESTURE = 24;
+  PICK_UP_GESTURE = 25;
+  WRIST_TILT_GESTURE = 26;
+  DEVICE_ORIENTATION = 27;
+  POSE_6DOF = 28;
+  STATIONARY_DETECT = 29;
+  MOTION_DETECT = 30;
+  HEART_BEAT = 31;
+  DYNAMIC_SENSOR_META = 32;
+  LOW_LATENCY_OFFBODY_DETECT = 34;
+  ACCELEROMETER_UNCALIBRATED = 35;
+}
+
+message AndroidSensorInfo {
+  option (semantic) = {
+    description : "Details about a sensor on an Android device."
+  };
+
+  enum ReportingMode {
+    CONTINUOUS = 0;
+    ON_CHANGE = 1;
+    ONE_SHOT = 2;
+    SPECIAL_TRIGGER = 3;
+  }
+
+  enum ReportingRateLevel {
+    STOP = 0;
+    NORMAL = 1;    // 50Hz
+    FAST = 2;      // ~200Hz
+    VERY_FAST = 3; // ~800Hz
+  }
+
+  optional string name = 1
+      [ (sem_type) = {description : "Name of the sensor."} ];
+  optional AndroidSensorType type = 2
+      [ (sem_type) = {description : "Generic type of this sensor."} ];
+  optional string vendor = 3
+      [ (sem_type) = {description : "Vendor name of this sensor."} ];
+  optional uint32 version = 4
+      [ (sem_type) = {description : "Version of the sensor's module."} ];
+  optional float power = 5 [ (sem_type) = {
+    description : "The power in mA used by this sensor while in use."
+  } ];
+  optional float resolution = 6 [ (sem_type) = {
+    description : "Resolution of the sensor in the sensor's unit."
+  } ];
+  optional uint32 minDelay = 7 [ (sem_type) = {
+    description : "The minimum delay allowed between two events in microsecond"
+                  "or zero if this sensor only returns a value when the data "
+                  "it's measuring changes."
+  } ];
+  optional uint32 maxDelay = 8 [ (sem_type) = {
+    description :
+        "This value is defined only for continuous and on-change sensors. "
+        "It is the delay between two sensor events corresponding to the lowest "
+        "frequency that this sensor supports. "
+  } ];
+  optional float maxRange = 9 [ (sem_type) = {
+    description : "Maximum range of the sensor in the sensor's unit."
+  } ];
+  optional ReportingMode reportingMode = 10 [
+    (sem_type) = {description : "The reporting mode for this sensor type."}
+  ];
+  optional uint32 fifoMaxEventCount = 11 [ (sem_type) = {
+    description :
+        "Maximum number of events of this sensor that could be batched."
+  } ];
+  optional uint32 fifoReservedEventCount = 12 [ (sem_type) = {
+    description :
+        "Number of events reserved for this sensor in the batch mode FIFO."
+  } ];
+  optional ReportingRateLevel highestDirectReportRateLevel = 13 [ (sem_type) = {
+    description :
+        "The highest supported direct report mode rate level of the sensor."
+  } ];
+}
+
+message AndroidSensorDataRequest {
+  option (semantic) = {
+    description : "Sensor data collection parameters."
+  };
+
+  optional AndroidSensorType type = 1 [
+    (sem_type) = {description : "Generic type of the sensor."},
+    default = ACCELEROMETER
+  ];
+  optional uint32 samplingRate = 2 [
+    (sem_type) = {
+      description :
+          "The desired interval in milliseconds for delivering sensor "
+          "data. This is only a hint to the system. Events may be "
+          "received faster or slower than the specified rate."
+    },
+    default = 50
+  ];
+  optional uint32 duration = 3 [
+    (sem_type) = {
+      description : "The duration in seconds for collecting the sensor data."
+    },
+    default = 1
+  ];
+}
+
+message AndroidSensorData {
+  option (semantic) = {
+    description : "Sensor data collection result."
+  };
+
+  enum Accuracy {
+    NO_CONTACT = -1;
+    UNRELIABLE = 0;
+    ACCURACY_LOW = 1;
+    ACCURACY_MEDIUM = 2;
+    ACCURACY_HIGH = 3;
+  }
+
+  optional Accuracy accuracy = 1
+      [ (sem_type) = {description : "The accuracy of the data."} ];
+  optional uint64 timestamp = 2 [ (sem_type) = {
+    description : "The time at which the data is generated in nanoseconds."
+  } ];
+  repeated float values = 3 [ (sem_type) = {
+    description : "Raw sensor data. Please see "
+                  "https://developer.android.com/reference/android/hardware/"
+                  "SensorEvent#values"
+  } ];
+}
+
+message AndroidSensorDataResponse {
+  option (semantic) = {
+    description : "Sensor data collection results."
+  };
+
+  optional AndroidSensorType type = 1
+      [ (sem_type) = {description : "Generic type of the sensor."} ];
+  optional uint64 startTime = 2 [ (sem_type) = {
+    type : "RDFDatetime",
+    description : "The time at which the data collection starts."
+  } ];
+  repeated AndroidSensorData data = 3
+      [ (sem_type) = {description : "List of sensor data."} ];
+}
+
+message AndroidNfcInfo {
+  option (semantic) = {
+    description : "NFC hardware information of an Android device."
+  };
+
+  optional bool isEnabled = 1 [ (sem_type) = {
+    description : "If this NFC Adapter has any features enabled."
+  } ];
+  optional bool isNdefPushEnabled = 2 [ (sem_type) = {
+    description : "If the NDEF Push (Android Beam) feature is enabled."
+  } ];
+}
+
+message AndroidAccount {
+  option (semantic) = {
+    description : "Details of an user account."
+  };
+
+  optional string name = 1 [ (sem_type) = {description : "Account name."} ];
+  optional string type = 2 [ (sem_type) = {description : "Account type."} ];
+  optional string previousName = 3 [ (sem_type) = {
+    description : "The previous name associated with the account."
+  } ];
+}
+
+message AndroidAccountAuthenticator {
+  option (semantic) = {
+    description : "Information about an account authenticator."
+  };
+
+  optional string type = 1 [ (sem_type) = {
+    description : "The string that uniquely identifies an authenticator."
+  } ];
+  optional string packageName = 2 [ (sem_type) = {
+    description :
+        "The label for the authenticator that is suitable for displaying."
+  } ];
+}
+
+message AndroidAccountInfo {
+  option (semantic) = {
+    description : "Information about user accounts and authenticators."
+  };
+
+  repeated AndroidAccount accounts = 1;
+  repeated AndroidAccountAuthenticator authenticators = 2;
+}
+
+message AndroidUserProfile {
+  option (semantic) = {
+    description : "Information about an Android device user."
+  };
+
+  optional uint32 id = 1 [ (sem_type) = {description : "User ID."} ];
+  optional uint32 serialNumber = 2
+      [ (sem_type) = {description : "User serial number."} ];
+  optional string name = 3 [ (sem_type) = {description : "User name."} ];
+  optional uint64 creationTime = 4 [ (sem_type) = {
+    type : "RDFDatetime",
+    description : "The time at which the user was created."
+  } ];
+  optional uint64 lastLoggedInTime = 5 [ (sem_type) = {
+    type : "RDFDatetime",
+    description : "The last time at which the user was logged in."
+  } ];
+  optional string lastLoggedInFingerprint = 6 [ (sem_type) = {
+    description :
+        "The device fingerprint used when the user was last logged in."
+  } ];
+  optional bool isPrimary = 7 [ (sem_type) = {
+    description : "If the user is the primary user on the device. It "
+                  "identifies the first human user on a device."
+  } ];
+  optional bool isAdmin = 8 [ (sem_type) = {
+    description : "If the user has administrative privileges. Such a user can "
+                  "create and delete users."
+  } ];
+  optional bool isGuest = 9 [ (sem_type) = {
+    description : "Indicates a guest user that may be transient."
+  } ];
+  optional bool isGuestToRemove = 10
+      [ (sem_type) = {description : "If this user is a to-be-removed guest."} ];
+  optional bool isSystem = 11
+      [ (sem_type) = {description : "If the user is a system user."} ];
+  optional bool isSystemOnly = 12
+      [ (sem_type) = {description : "If the user is a split system user."} ];
+  optional bool isPartial = 13 [
+    (sem_type) = {description : "Whether user is only partially created."}
+  ];
+  optional bool isEnabled = 14
+      [ (sem_type) = {description : "Indicates that this user is enabled."} ];
+  optional bool isRestricted = 15 [ (sem_type) = {
+    description : "Indicates the user has restrictions in privileges, in "
+                  "addition to those for normal users."
+  } ];
+  optional bool isManagedProfile = 16 [ (sem_type) = {
+    description : "Indicates that this user is a profile of another user."
+  } ];
+  optional bool isQuietModeEnabled = 17 [ (sem_type) = {
+    description : "Whether the given user is in quiet mode or not."
+  } ];
+  optional bool isEphemeral = 18
+      [ (sem_type) = {description : "Indicates that this user is ephemeral."} ];
+  optional bool isInitialized = 19 [ (sem_type) = {
+    description : "Indicates that this user has gone through its first-time "
+                  "initialization."
+  } ];
+  optional bool isDemo = 20 [ (sem_type) = {
+    description :
+        "User is for demo purposes only and can be removed at any time."
+  } ];
+  optional bool isUserRunning = 21 [ (sem_type) = {
+    description : "Whether the given user is actively running."
+  } ];
+  optional bool isUserStopping = 22 [ (sem_type) = {
+    description : "Whether the given user is in the process of stopping."
+  } ];
+  optional bool isUserUnlocked = 23 [ (sem_type) = {
+    description :
+        "Whether the given user is running in an \"unlocked\" state."
+  } ];
+  optional bool supportsSwitchTo = 24
+      [ (sem_type) = {description : "If this user can be switched to"} ];
+  optional bool supportsSwitchToByUser = 25 [ (sem_type) = {
+    description : "If this user can be switched to by end user through UI."
+  } ];
+}
+
+message AndroidVpnProfile {
+  option (semantic) = {
+    description : "Android VPN profile information."
+  };
+
+  enum Type {
+    TYPE_PPTP = 0;
+    TYPE_L2TP_IPSEC_PSK = 1;
+    TYPE_L2TP_IPSEC_RSA = 2;
+    TYPE_IPSEC_XAUTH_PSK = 3;
+    TYPE_IPSEC_XAUTH_RSA = 4;
+    TYPE_IPSEC_HYBRID_RSA = 5;
+  }
+
+  optional Type type = 1 [ (sem_type) = {description : "VPN type"} ];
+  optional string name = 2 [ (sem_type) = {description : "VPN profile name"} ];
+  optional string server = 3
+      [ (sem_type) = {description : "VPN server address"} ];
+  optional string username = 4 [ (sem_type) = {description : "VPN user name"} ];
+  optional string password = 5 [ (sem_type) = {description : "VPN password"} ];
+  optional string dnsServers = 6
+      [ (sem_type) = {description : "DNS server address"} ];
+  optional string searchDomains = 7
+      [ (sem_type) = {description : "DNS search domains"} ];
+  optional string routes = 8 [ (sem_type) = {description : "Network routes"} ];
+  optional bool isMppe = 9
+      [ (sem_type) = {description : "Is Microsoft Point-to-Point Encryption"} ];
+  optional string l2tpSecret = 10
+      [ (sem_type) = {description : "L2TP secret value"} ];
+  optional string ipsecIdentifier = 11
+      [ (sem_type) = {description : "IPSEC identifier"} ];
+  optional string ipsecSecret = 12
+      [ (sem_type) = {description : "IPSEC secret value"} ];
+  optional string ipsecUserCert = 13
+      [ (sem_type) = {description : "IPSEC user certificate name"} ];
+  optional string ipsecCaCert = 14
+      [ (sem_type) = {description : "IPSEC CA certificate name"} ];
+  optional string ipsecServerCert = 15
+      [ (sem_type) = {description : "IPSEC server certificate name"} ];
+}

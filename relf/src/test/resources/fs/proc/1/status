@@ -1,0 +1,46 @@
+Name:	rogue process
+State:	S (sleeping)
+Tgid:	1
+Ngid:	0
+Pid:	1
+PPid:	0
+TracerPid:	0
+Uid:	0	1	2	0
+Gid:	0	2	3	0
+FDSize:	64
+Groups:	3009 
+NStgid:	1
+NSpid:	1
+NSpgid:	0
+NSsid:	0
+VmPeak:	   18864 kB
+VmSize:	   18840 kB
+VmLck:	       0 kB
+VmPin:	       0 kB
+VmHWM:	    3716 kB
+VmRSS:	    3564 kB
+VmData:	    4204 kB
+VmStk:	     132 kB
+VmExe:	    2244 kB
+VmLib:	       0 kB
+VmPTE:	      48 kB
+VmPMD:	      12 kB
+VmSwap:	       0 kB
+HugetlbPages:	       0 kB
+Threads:	1
+SigQ:	0/6825
+SigPnd:	0000000000000000
+ShdPnd:	0000000000000000
+SigBlk:	0000000000000000
+SigIgn:	0000000000000000
+SigCgt:	00000000400184f8
+CapInh:	0000000000000000
+CapPrm:	0000003fffffffff
+CapEff:	0000003fffffffff
+CapBnd:	0000003fffffffff
+CapAmb:	0000000000000000
+Seccomp:	0
+Cpus_allowed:	3
+Cpus_allowed_list:	0-1
+voluntary_ctxt_switches:	606
+nonvoluntary_ctxt_switches:	394

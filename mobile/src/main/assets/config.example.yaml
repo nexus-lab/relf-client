@@ -1,0 +1,19 @@
+Client.name: ReLF Client
+Client.description: 'Client for "ReLF: Scalable Remote Live Forensics for Android"'
+Client.labels: []
+Client.server_urls: []
+Client.proxy_servers: []
+Client.server_serial_number: 0
+Client.max_out_queue: 51200000
+Client.rsa_key_length: 2048
+Client.max_post_size: 40000000
+Client.poll_min: 1
+Client.poll_max: 600
+Client.foreman_check_frequency: 1800
+Client.rss_max: 1000
+Network.api: 3
+CA.certificate: ''
+Template.version_major: 3
+Template.version_minor: 2
+Template.version_revision: 1
+Template.version_release: 1

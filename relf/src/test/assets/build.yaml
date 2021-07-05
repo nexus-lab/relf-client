@@ -1,0 +1,10 @@
+Client.build_environment: cp27-cp27mu-linux_x86_64
+Client.build_time: '2017-09-04 15:58:47'
+Template.arch: amd64
+Template.build_context: [ClientBuilder Context, ClientBuilder Context, 'Arch:amd64',
+  'Platform:Linux', 'Target:Linux', 'Target:LinuxDeb', 'Target:Linux']
+Template.build_type: Release
+Template.version_major: '3'
+Template.version_minor: '2'
+Template.version_release: '1'
+Template.version_revision: '0'

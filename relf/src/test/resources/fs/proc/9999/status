@@ -1,0 +1,46 @@
+Name:	relf_service
+State:	S (sleeping)
+Tgid:	1676
+Ngid:	0
+Pid:	1676
+PPid:	1
+TracerPid:	0
+Uid:	1000	1000	1000	1000
+Gid:	1000	1000	1000	1000
+FDSize:	64
+Groups:	3009 
+NStgid:	1676
+NSpid:	1676
+NSpgid:	1676
+NSsid:	0
+VmPeak:	   17604 kB
+VmSize:	   15560 kB
+VmLck:	       0 kB
+VmPin:	       0 kB
+VmHWM:	    4260 kB
+VmRSS:	    4260 kB
+VmData:	    7728 kB
+VmStk:	     132 kB
+VmExe:	      28 kB
+VmLib:	    5360 kB
+VmPTE:	      48 kB
+VmPMD:	      12 kB
+VmSwap:	       0 kB
+HugetlbPages:	       0 kB
+Threads:	2
+SigQ:	0/6825
+SigPnd:	0000000000000000
+ShdPnd:	0000000000000000
+SigBlk:	0000000000000000
+SigIgn:	0000000000000000
+SigCgt:	00000004400084f8
+CapInh:	0000000000080004
+CapPrm:	0000000000080004
+CapEff:	0000000000080004
+CapBnd:	0000000000080004
+CapAmb:	0000000000080004
+Seccomp:	0
+Cpus_allowed:	3
+Cpus_allowed_list:	0-1
+voluntary_ctxt_switches:	3
+nonvoluntary_ctxt_switches:	7

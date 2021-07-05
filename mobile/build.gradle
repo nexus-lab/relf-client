@@ -1,0 +1,57 @@
+apply plugin: 'com.android.application'
+
+android {
+    flavorDimensions "default"
+    compileSdkVersion build_versions.target_sdk
+    buildToolsVersion build_versions.build_tools
+    defaultConfig {
+        applicationId "org.nexus_lab.relf.mobile"
+        minSdkVersion build_versions.min_sdk
+        targetSdkVersion build_versions.target_sdk
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+    signingConfigs {
+        debugKey {
+            keyAlias 'aosp'
+            keyPassword 'nexuslab'
+            storeFile file('../keys/platform.jks')
+            storePassword 'nexuslab'
+        }
+    }
+    buildTypes {
+        debug {
+            signingConfig signingConfigs.debugKey
+        }
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    productFlavors {
+        user {}
+        system {}
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    configurations.all {
+        resolutionStrategy.force 'com.google.code.findbugs:jsr305:1.3.9'
+    }
+}
+
+dependencies {
+    implementation project(':relf')
+
+    // Annotation Processing
+    compileOnly deps.lombok.annotation
+    annotationProcessor deps.lombok.annotation
+
+    // Android
+    implementation deps.androidx.appcompat
+
+    // Test
+    testImplementation deps.junit
+}

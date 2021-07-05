@@ -1,0 +1,104 @@
+/**
+ * Shared file between builds so that they can all use the same dependencies and
+ * maven repositories.
+ **/
+def versions = [:]
+versions.android_gradle_plugin = "3.4.0"
+versions.android_permission_helper = "2.0.1"
+versions.androidx_appcompat = "1.0.0"
+versions.androidx_test_core = "1.0.0"
+versions.androidx_test_runner = "1.1.0"
+versions.androidx_test_rules = "1.1.0"
+versions.androidx_test_ext = "1.0.0"
+versions.android_device_names = "1.1.8"
+versions.bouncycastle = "1.58"
+versions.classindex = "3.4"
+versions.commons_io = "2.6"
+versions.commons_lang3 = "3.8.1"
+versions.commons_collections4 = "4.1"
+versions.commons_text = "1.5"
+versions.junit = "4.12"
+versions.lombok_gradle_plugin = "4.0.0"
+versions.lombok_annotation = "1.18.20"
+versions.mockwebserver = "3.9.0"
+versions.okhttp = "3.10.0"
+versions.protobuf_gradle_plugin = "0.8.8"
+versions.protobuf_compiler = "3.3.0"
+versions.protobuf_lite = "3.0.0"
+versions.protobuf_javalite = "3.0.0"
+versions.protobuf_lite_converter = "2.0.1"
+versions.robolectric = "4.2.1"
+versions.snakeyaml = "1.23"
+versions.faker = "0.16"
+
+def deps = [:]
+
+def androidx = [:]
+androidx.appcompat = "androidx.appcompat:appcompat:$versions.androidx_appcompat"
+androidx.test_core = "androidx.test:core:$versions.androidx_test_core"
+androidx.test_runner = "androidx.test:runner:$versions.androidx_test_runner"
+androidx.test_rules = "androidx.test:rules:$versions.androidx_test_rules"
+androidx.test_ext = "androidx.test.ext:junit:$versions.androidx_test_ext"
+
+def bouncycastle = [:]
+bouncycastle.bcpkix = "org.bouncycastle:bcpkix-jdk15on:$versions.bouncycastle"
+bouncycastle.bcprov = "org.bouncycastle:bcprov-jdk15on:$versions.bouncycastle"
+
+def commons = [:]
+commons.io = "commons-io:commons-io:$versions.commons_io"
+commons.lang3 = "org.apache.commons:commons-lang3:$versions.commons_lang3"
+commons.collections4 = "org.apache.commons:commons-collections4:$versions.commons_collections4"
+commons.text = "org.apache.commons:commons-text:$versions.commons_text"
+
+def lombok = [:]
+lombok.gradle_plugin = "io.franzbecker:gradle-lombok:$versions.lombok_gradle_plugin"
+lombok.annotation = "org.projectlombok:lombok:$versions.lombok_annotation"
+
+def protobuf = [:]
+protobuf.gradle_plugin = "com.google.protobuf:protobuf-gradle-plugin:$versions.protobuf_gradle_plugin"
+protobuf.compiler = "com.google.protobuf:protoc:$versions.protobuf_compiler"
+protobuf.lite = "com.google.protobuf:protobuf-lite:$versions.protobuf_lite"
+protobuf.javalite = "com.google.protobuf:protoc-gen-javalite:$versions.protobuf_javalite"
+protobuf.lite_converter = "com.github.nexus-lab:protobuf-lite-converter:$versions.protobuf_lite_converter"
+
+deps.androidx = androidx
+deps.bouncycastle = bouncycastle
+deps.commons = commons
+deps.lombok = lombok
+deps.protobuf = protobuf
+deps.android_gradle_plugin = "com.android.tools.build:gradle:$versions.android_gradle_plugin"
+deps.android_permission_helper = "il.co.galex.tools.build:permissions:$versions.android_permission_helper"
+deps.android_device_names = "com.jaredrummler:android-device-names:$versions.android_device_names"
+deps.classindex = "org.atteo.classindex:classindex:$versions.classindex"
+deps.junit = "junit:junit:$versions.junit"
+deps.okhttp = "com.squareup.okhttp3:okhttp:$versions.okhttp"
+deps.mock_web_server = "com.squareup.okhttp3:mockwebserver:$versions.mockwebserver"
+deps.robolectric = "org.robolectric:robolectric:$versions.robolectric"
+deps.snakeyaml = "org.yaml:snakeyaml:$versions.snakeyaml:android"
+deps.faker = "com.github.javafaker:javafaker:$versions.faker"
+
+ext.deps = deps
+
+def build_versions = [:]
+build_versions.min_sdk = 21
+build_versions.target_sdk = 28
+build_versions.compile_sdk = 28
+build_versions.build_tools = "28.0.3"
+ext.build_versions = build_versions
+
+
+static def addRepos(RepositoryHandler handler) {
+    handler.google()
+    handler.jcenter()
+    handler.maven { url 'https://jitpack.io' }
+    handler.maven { url 'https://plugins.gradle.org/m2/' }
+}
+
+static def addResposAllProject(RepositoryHandler handler) {
+    handler.google()
+    handler.jcenter()
+    handler.maven { url 'https://jitpack.io' }
+}
+
+ext.addRepos = this.&addRepos
+ext.addResposAllProject = this.&addResposAllProject

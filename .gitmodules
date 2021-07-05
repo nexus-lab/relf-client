@@ -1,0 +1,3 @@
+[submodule "relf/src/main/aidl"]
+	path = relf/src/main/aidl
+	url = https://github.com/nexus-lab/relf-client-aidl.git

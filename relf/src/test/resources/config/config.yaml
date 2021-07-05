@@ -1,0 +1,89 @@
+CA.certificate: '-----BEGIN CERTIFICATE-----
+
+  MIIC2zCCAcOgAwIBAgIBATANBgkqhkiG9w0BAQsFADAgMREwDwYDVQQDDAhncnJf
+
+  dGVzdDELMAkGA1UEBhMCVVMwHhcNMTcxMTA1MTUxNjIxWhcNMjcxMTA0MTUxNjIx
+
+  WjAOMQwwCgYDVQQDDANncnIwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIB
+
+  AQDRCSdBq4A2DAHFeWe0i39UBGy9P4fdW7q16VP3dlypP6IZOM3PHJuRS5Hc4Bph
+
+  ewJtYlsc3d6pwPIJt2pVE5FAVeil3mKjc6urEh8tHtxt5h0Wzjzn2cjJeLmKpFfa
+
+  vTP2m51SOlEhAaP052hX5N6li6Md+4JOhvfEqM8rKA+zrfhmKwczTnqPS2NVaKif
+
+  Uv6gvN2DYYay1dl65dWuxrQ2q0BMFGZc3obbPbp/+UyzNTUIoe+Rhb6FwLFZHFkE
+
+  CtU/c2IEM4VD+Gjes9D6J81iwKhi5TL+1uMW+9cEqUw3PZzcFx5T5B5jGDj1JT+v
+
+  eNhH5U1cuwXEEKx3TtZtHE0pAgMBAAGjMjAwMA8GA1UdEwEB/wQFMAMBAf8wHQYD
+
+  VR0OBBYEFNlLIO28MmZr7vvesqFkQSzFbo0fMA0GCSqGSIb3DQEBCwUAA4IBAQC/
+
+  ga0I21Ub+MqlBxMZhn3tPbZUZDhVLBgNf5OX8WHOmVW2GFJAm8J+fffIkLtRiRnx
+
+  r89V1mj3uyMqBQ7/9W4u2H+1rvEbXCRqMzumVb0hEZyz7ti2tt5K/NWcSk/CgG1I
+
+  r9+kU/m4J7QSSSX+1Ztu9pebBrw10nB/LwsN5UE2H6vqNj9pucGgs2ykTfwd25nn
+
+  GdDt+Pxi/XX5lrXQWRw2MkGZWFtb4l/GE4gQbzebfBsVQZSOr1p81Dc1YumFIV86
+
+  OSUiJyz1Gtld3BqZCIEPs/5MrHdS7N7s7Fl4LcjwGxq2Ns68pZjsdnSjRbjCYz7/
+
+  FniaTsXjApVKUlx7/ws5
+
+  -----END CERTIFICATE-----'
+Client.arch: amd64
+Client.binary_name: relf
+Client.build_environment: cp27-cp27mu-linux_x86_64
+Client.build_time: '2017-09-04 15:58:47'
+Client.company_name: ReLF Project
+Client.description: '%(name) %(platform) %(arch)'
+Client.executable_signing_public_key: '-----BEGIN PUBLIC KEY-----
+
+  MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApPSK2WI0hQYqmbrfDjuP
+
+  r3geOWMfX5xC78qOKXeuPgpV2Vc3JWJ5Lgs42+oupEDhp6fsgKdt83cNywLTWpYi
+
+  AQniyisJQgtJSD2Yhr1fL9/1gQWV7N94RGKufCltq6tiWCzzsYQphjYJTZX3adBz
+
+  LT07Np6inBv2rztA8t+O62O8dxi3j7eULK0PefoQjeyXImb1EShv7xLGyL8NiB9Q
+
+  8jz7Q5EcuHwoJ47OGRQlNfz/Ei7uqJb6JcuGVN6jVp+cm4R8TsrMpBib93z+wjiz
+
+  MmEL6T3n5mgrngmCsYQc6gBPej3g9RF4Eq2bCtUHDUwxfK/Z89CnHFiuOgwmgEE0
+
+  eQIDAQAB
+
+  -----END PUBLIC KEY-----'
+Client.foreman_check_frequency: 1800
+Client.install_path: /usr/lib/%(Client.name)/%(ClientRepacker.output_basename)
+Client.name: relf
+Client.platform: linux
+Client.poll_max: 600
+Client.rekall_profile_cache_path: '%(Client.install_path)/rekall_profiles'
+Client.server_urls: http://172.16.100.1:8080/
+Config.includes:
+- build.yaml
+- test.yaml
+Config.writeback: ./%(Client.name).local.yaml
+Logging.domain: localhost
+Logging.engines: stderr
+Logging.path: /var/log
+Logging.syslog_path: /dev/log
+Logging.verbose: false
+Template.arch: amd64
+Template.build_context:
+- ClientBuilder Context
+- ClientBuilder Context
+- Arch:amd64
+- Platform:Linux
+- Target:Linux
+- Target:LinuxDeb
+- Target:Linux
+Template.build_type: Release
+Template.version_major: '3'
+Template.version_minor: '2'
+Template.version_release: '1'
+Template.version_revision: '0'
+Client.deploy_time: '2017-11-06 15:16:22'

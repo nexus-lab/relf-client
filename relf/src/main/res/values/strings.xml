@@ -1,0 +1,7 @@
+<resources>
+    <string name="config_file_prefix">org.nexus_lab.relf.config.</string>
+    <string name="config_file_main">org.nexus_lab.relf.config.main</string>
+    <string name="config_file_includes_key">Config.includes</string>
+    <string name="config_file_writeback_key">Config.writeback</string>
+    <string name="config_file_writeback">org.nexus_lab.relf.config.local</string>
+</resources>
